@@ -1,0 +1,94 @@
+$sst-em: #009bff;
+$sst-bg: #180124;
+$sst-fg: #fff;
+$sst-pink: #ff00eb;
+$sst-purple: #8000ff;
+
+$primary: $sst-purple;
+//$info: $sst-em;
+$success: #22cc00;
+$warning: #ffcc00;
+$danger: #ff0066;
+//$link-color: $sst-pink;
+//$enable-rounded: false;
+$component-active-bg: #ced4da; // gray-400
+$input-btn-focus-width: 2px;
+
+$badge-padding-x: .5em;
+
+//// Required
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
+//@import "~bootstrap/scss/bootstrap";
+
+$theme-colors: (
+  "primary": $primary,
+  "secondary": $secondary,
+  "success": $success,
+  "info": $info,
+  "warning": $warning,
+  "danger": $danger,
+  "light": $light,
+  "gray": $gray-200,
+  "dark": $dark,
+);
+
+$form-feedback-warning-color: $warning;
+$form-feedback-icon-warning-color: $form-feedback-warning-color;
+$form-feedback-icon-warning: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='#{$form-feedback-icon-warning-color}'><circle cx='6' cy='6' r='4.5'/><path stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/><circle cx='6' cy='8.2' r='.6' fill='#{$form-feedback-icon-warning-color}' stroke='none'/></svg>") !default;
+
+$form-validation-states: (
+  "valid": (
+    "color": $form-feedback-valid-color,
+    "icon": $form-feedback-icon-valid,
+  ),
+  "invalid": (
+    "color": $form-feedback-invalid-color,
+    "icon": $form-feedback-icon-invalid,
+  ),
+  "warning": (
+    "color": $form-feedback-warning-color,
+    "icon": $form-feedback-icon-warning,
+  )
+);
+
+// Bootstrap and its default variables
+
+//// Optional
+//@import "~bootstrap/scss/root";
+//@import "~bootstrap/scss/reboot";
+//@import "~bootstrap/scss/type";
+
+@import "~bootstrap/scss/bootstrap";
+
+$vs-component-line-height: $input-line-height;
+$vs-component-placeholder-color: $input-placeholder-color;
+
+$vs-state-active-bg: $dropdown-link-hover-bg;
+$vs-state-active-color: inherit;
+
+$vs-border-width: $input-border-width;
+$vs-border-radius: $input-border-radius;
+$vs-border-color: $input-border-color;
+
+$vs-controls-color: $input-placeholder-color;
+
+//$vs-dropdown-z-index: 1000 !default;
+$vs-dropdown-min-width: $dropdown-min-width;
+//$vs-dropdown-max-height: 350px !default;
+$vs-dropdown-box-shadow: $dropdown-box-shadow;
+$vs-dropdown-bg: $dropdown-bg;
+
+@import '~vue-select/src/scss/vue-select';
+@import 'vue-select-overrides';
+
+@import "loading";
+@import "color-label";
+@import "dropdown-expand";
+@import "bootstrap-overrides";
+@import "shortcuts";
+@import "buttons";
+@import "submit-status";
+@import "title-help";

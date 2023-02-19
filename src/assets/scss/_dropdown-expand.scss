@@ -1,0 +1,19 @@
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .dropdown-expand#{$infix} {
+      [data-bs-toggle="dropdown"] {
+        display: none;
+      }
+      .dropdown-menu {
+        position: initial !important;
+        display: initial;
+        transform: none !important;
+        z-index: initial;
+        background: initial;
+      }
+    }
+  }
+}

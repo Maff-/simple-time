@@ -1,0 +1,11 @@
+.shortcuts-help-content {
+  section + section {
+    margin-top: map-get($spacers, 4);
+  }
+  section > header {
+    margin-bottom: map-get($spacers, 2);
+  }
+  .shortcut {
+    margin-bottom: map-get($spacers, 1);
+  }
+}

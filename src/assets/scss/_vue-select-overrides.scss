@@ -1,0 +1,97 @@
+$vs-selected-padding-x: $input-padding-x-sm / 2 !default;
+
+.vs__dropdown-toggle {
+  padding-bottom: $input-padding-y !important;
+}
+
+.vs__selected,
+.vs__search, .vs__search:focus {
+  margin-top: $input-padding-y !important;
+  border: none !important;
+}
+
+.vs__actions {
+  padding-top: $input-padding-y !important;
+  padding-left: $input-padding-x / 2 !important;
+  padding-right: $input-padding-x !important;
+}
+
+.vs__fade-enter-active,
+.vs__fade-leave-active {
+  transition: none;
+}
+
+.vs__selected-options {
+  padding-left: $input-padding-x - $vs-selected-padding-x !important;
+  padding-right: 0 !important;
+}
+
+.vs__selected {
+  margin-left: $vs-selected-padding-x;
+  margin-right: $vs-selected-padding-x;
+  padding-left: $badge-padding-x !important;
+  padding-right: $badge-padding-x !important;
+}
+
+.vs__deselect {
+  margin-left: $badge-padding-x !important;
+}
+
+.vs--single {
+  .vs__selected-options {
+    padding-left: $input-padding-x !important;
+  }
+  .vs__search,
+  .vs__selected {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  .vs__clear svg {
+    display: block;
+  }
+}
+
+.vs--single-line .vs__selected {
+  display: inline-block;
+  position: absolute;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  left: $input-padding-x;
+  right: 0;
+}
+
+// form states
+
+@mixin vs-form-validation-state(
+  $state,
+  $color,
+  $icon,
+  $tooltip-color: color-contrast($color),
+  $tooltip-bg-color: rgba($color, $form-feedback-tooltip-opacity),
+  $focus-box-shadow: 0 0 0 $input-focus-width rgba($color, $input-btn-focus-color-opacity)
+) {
+  .vs--single-line {
+    @include form-validation-state-selector($state) {
+      .vs__dropdown-toggle, .vs__dropdown-menu {
+        border-color: $color;
+      }
+
+      @if $enable-validation-icons {
+        .vs__actions {
+          padding-left: calc(#{$input-line-height * .5em} + #{$input-padding-y} + #{$input-padding-x}) !important;
+          background-image: escape-svg($icon);
+          background-position: ($input-padding-x / 2) .5375rem;
+          background-size: $form-select-feedback-icon-size;
+          background-repeat: no-repeat;
+        }
+      }
+    }
+  }
+}
+
+@each $state, $data in $form-validation-states {
+  @include vs-form-validation-state($state, $data...);
+}
