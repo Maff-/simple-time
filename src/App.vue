@@ -408,6 +408,7 @@ const version = process.env.VUE_APP_VERSION;
 const defaultSettings = {
     apiUrl: `${process.env.VUE_APP_SIMPLICATE_URL}/api/v2`,
     jiraApiUrl: `${jiraUrl}/rest/api/2`,
+    jiraProjectKeyPattern: '[A-Z][A-Z_0-9]+',
     projectsSort: 'project_name',
     jiraDebounce: 200, // ms
     pickDate: true,
@@ -1231,7 +1232,7 @@ export default {
                     this.loggedHours = result.map(entry => {
                         const externalUrlFields = (entry.custom_fields || []).filter(f => f.name === 'external_url' && f.value);
                         const externalUrl = externalUrlFields.length ? externalUrlFields[0].value : null;
-                        const jiraKeyMatch = externalUrl ? externalUrl.match(/\/browse\/([A-Z0-9]+-\d+)/i) : null;
+                        const jiraKeyMatch = externalUrl ? externalUrl.match(/\/browse\/([A-Z][A-Z_0-9]+-\d+)/i) : null;
                         const jiraKey = jiraKeyMatch ? jiraKeyMatch[1] : null;
 
                         // copy some props from the 'type' object
@@ -1358,13 +1359,13 @@ export default {
             } else {
                 searchOr.push(`text ~ '${escape(search)}'`);
             }
-            const keyMatch = search.match(/^([A-Z]+)-\d+$/i);
+            const keyMatch = search.match(new RegExp(`^(${this.settings.jiraProjectKeyPattern})-\\d+$`, 'i'));
             if (keyMatch && this.jiraProjectKeys.includes(keyMatch[1].toUpperCase())) {
                 searchOr.push(`key = ${escape(search)}`);
             }
-            const projectMatch = search.match(/^[A-Z]{3,}\d*\b/);
-            if (projectMatch && this.jiraProjectKeys.includes(projectMatch[0])) {
-                searchOr.push(`project = ${escape(search)}`);
+            const projectMatch = search.match(new RegExp(`^${this.settings.jiraProjectKeyPattern}`, 'i'));
+            if (projectMatch && this.jiraProjectKeys.includes(projectMatch[0].toUpperCase())) {
+                searchOr.push(`project = ${escape(projectMatch[0].toUpperCase())}`);
             }
             return new URLSearchParams({
                 jql: searchOr.join(' OR '),
@@ -1389,6 +1390,14 @@ export default {
                         });
                     } else {
                         this.jiraIssues = [];
+                    }
+                })
+                .catch(error => {
+                    if (error.response && error.response.data && error.response.data.errorMessages) {
+                        console.warn('Error fetching Jira issues;', error.response.data.errorMessages.join(', '));
+                        console.debug(error);
+                    } else {
+                        console.error('Error fetching Jira issues;', error);
                     }
                 })
                 .finally(() => {

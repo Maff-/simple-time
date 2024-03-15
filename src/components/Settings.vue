@@ -152,6 +152,20 @@
             <label for="jiraApiUrl" class="form-label">Jira API URL</label>
             <input type="url" v-model.lazy="value.jiraApiUrl" id="jiraApiUrl" required class="form-control">
         </div>
+        <div class="col-12">
+            <label for="jiraProjectKeyPattern" class="form-label">Jira Project Key Pattern</label>
+            <input type="text" v-model.lazy="value.jiraProjectKeyPattern" id="jiraProjectKeyPattern" required class="form-control" :class="{'is-invalid': jiraProjectKeyPatternInvalid}">
+            <div class="form-text">
+                Should match your Jira configuration. Must be a valid regex (without beginning/end of input matching, i.e. <code>^</code>, <code>$</code>).<br>
+                Usually one of these, or something similar:
+                <ul class="list-inline d-inline">
+                    <li v-for="pattern in jiraProjectKeyPatternExamples" :key="pattern" class="list-inline-item">
+                        <code title="Click to use this setting" @click="value.jiraProjectKeyPattern = pattern">{{ pattern }}</code>
+                    </li>
+                </ul>
+            </div>
+            <div v-if="jiraProjectKeyPatternInvalid" class="invalid-feedback">Invalid regular expression; (<code>new RegExp('{{ value.jiraProjectKeyPattern }}')</code> failed)</div>
+        </div>
 
         <div class="col-12">
             <hr>
@@ -186,6 +200,11 @@ export default {
             type: String,
             required: false,
         },
+        jiraProjectKeyPatternExamples: {
+            type: Array,
+            required: false,
+            default: () => ['[A-Z][A-Z_0-9]+', '[A-Z][A-Z]+', '[A-Z]{2}[0-9]{2}'],
+        },
     },
     computed: {
         preferredServiceRegexes () {
@@ -193,23 +212,26 @@ export default {
         },
         preferredServiceRegexInvalid () {
             return this.preferredServiceRegexes
-                .filter(val => val && !this.isValidRegex(val));
+                .filter(val => val && !this.isValidRegex(val, 'iu'));
         },
         preferredHoursTypeRegexes () {
             return (this.value.preferredHoursTypeRegex || '').split('\n');
         },
         preferredHoursTypeRegexInvalid () {
             return this.preferredHoursTypeRegexes
-                .filter(val => val && !this.isValidRegex(val));
+                .filter(val => val && !this.isValidRegex(val, 'iu'));
         },
+        jiraProjectKeyPatternInvalid () {
+            return !this.isValidRegex(this.value.jiraProjectKeyPattern);
+        }
     },
     methods: {
-        isValidRegex (pattern) {
+        isValidRegex (pattern, flags) {
             if (!pattern) {
                 return false;
             }
             try {
-                new RegExp(pattern, 'iu');
+                new RegExp(pattern, flags);
             } catch {
                 return false;
             }
