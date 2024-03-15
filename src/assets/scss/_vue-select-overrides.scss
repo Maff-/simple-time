@@ -1,4 +1,6 @@
-$vs-selected-padding-x: $input-padding-x-sm / 2 !default;
+@use 'sass:math';
+
+$vs-selected-padding-x: math.div($input-padding-x-sm, 2) !default;
 
 .vs__dropdown-toggle {
   padding-bottom: $input-padding-y !important;
@@ -12,7 +14,7 @@ $vs-selected-padding-x: $input-padding-x-sm / 2 !default;
 
 .vs__actions {
   padding-top: $input-padding-y !important;
-  padding-left: $input-padding-x / 2 !important;
+  padding-left: math.div($input-padding-x, 2) !important;
   padding-right: $input-padding-x !important;
 }
 
@@ -83,7 +85,7 @@ $vs-selected-padding-x: $input-padding-x-sm / 2 !default;
         .vs__actions {
           padding-left: calc(#{$input-line-height * .5em} + #{$input-padding-y} + #{$input-padding-x}) !important;
           background-image: escape-svg($icon);
-          background-position: ($input-padding-x / 2) .5375rem;
+          background-position: math.div($input-padding-x, 2) .5375rem;
           background-size: $form-select-feedback-icon-size;
           background-repeat: no-repeat;
         }

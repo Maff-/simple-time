@@ -12,16 +12,24 @@ $danger: #ff0066;
 //$link-color: $sst-pink;
 //$enable-rounded: false;
 $component-active-bg: #ced4da; // gray-400
-$input-btn-focus-width: 2px;
 
 $badge-padding-x: .5em;
+
+// Start tweaks to make Bootstrap 5.3 look more like 5.0
+$border-radius: .25rem;
+$border-radius-sm: .2rem;
+$border-radius-lg: .3rem;
+$border-radius-xl: .75rem;
+
+$focus-ring-width: 2px;
+$focus-ring-opacity: 0.25;
+$focus-ring-color: rgba($component-active-bg, $focus-ring-opacity);
+// End 5.0 look tweaks
 
 //// Required
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/mixins";
-
-//@import "~bootstrap/scss/bootstrap";
 
 $theme-colors: (
   "primary": $primary,
