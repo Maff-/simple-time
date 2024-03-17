@@ -192,7 +192,7 @@
         <hr>
 
         <div class="position-relative">
-            <div class="table-responsive" v-if="loggedHours.length">
+            <div id="logged-hours" class="table-responsive" v-if="loggedHours.length">
             <table class="table mb-0">
                 <!-- TODO: use 'fixed' column widths to prevent annoying jumps when switching between days -->
                 <thead>
@@ -244,7 +244,7 @@
                     </td>
                     <td class="text-nowrap">
                         <div class="dropstart dropdown-expand-xl">
-                            <button type="button" class="btn btn-sm btn-light text-muted" title="Toggle actions" data-bs-toggle="dropdown" data-bs-offset="0,10"><i class="bi bi-three-dots"></i></button>
+                            <button type="button" class="btn btn-sm btn-tertiary text-muted" title="Toggle actions" data-bs-toggle="dropdown" data-bs-offset="0,10"><i class="bi bi-three-dots"></i></button>
                             <div class="dropdown-menu p-0 border-0 text-nowrap" style="min-width: unset">
                                 <button type="button" @click="confirmDeleteHours(hours.id, hours)" :disabled="hours.locked" class="btn btn-sm btn-outline-danger" title="Remove entry"><i class="bi-trash"></i></button>
                                 <button type="button" @click="editHours(hours)" :disabled="hours.locked" class="ms-1 btn btn-sm btn-outline-warning" title="Edit entry"><i class="bi-pencil"></i></button>
@@ -295,6 +295,19 @@
         <footer class="d-flex justify-content-between text-muted">
             <nav class="d-flex flex-wrap gap-2">
                 <a href="https://github.com/Maff-/simple-time" class="text-muted me-3" title="simple-time @ Github"><i class="bi-github"></i></a>
+                <div class="dropup">
+                    <a data-bs-toggle="dropdown" aria-expanded="false" id="theme-selector" href="#" class="text-muted" title="Theme selector">
+                        <i :class="`bi-${themeOptions[theme]?.icon}`"></i>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="theme-selector">
+                        <li v-for="(details, option) in themeOptions" :key="option">
+                            <a @click.prevent="settings.theme = option" href="#" class="dropdown-item" :class="{ active: option === theme }">
+                                <i :class="`bi-${details.icon}`"></i>
+                                <span class="ms-2">{{ details.label }}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
                 <a data-bs-toggle="modal" href="#settings" class="text-muted">Settings</a>
                 <a data-bs-toggle="modal" href="#project-mapping" class="text-muted">Project Mapping</a>
                 <a data-bs-toggle="modal" href="#shortcuts" class="text-muted">Shortcuts</a>
@@ -401,6 +414,7 @@ import WeekTotals from "@/components/WeekTotals";
 import debounce from '@/lib/debounce';
 import dateWeekNumber from "@/lib/dateWeekNumber";
 import dateUtil from "@/lib/dateUtil";
+import themeSelector from "@/lib/themeSelector";
 
 const jiraUrl = process.env.VUE_APP_JIRA_URL;
 const version = process.env.VUE_APP_VERSION;
@@ -429,6 +443,7 @@ const defaultSettings = {
     showSubmissions: true,
     hideLoggedService: false,
     hideLoggedType: false,
+    theme: 'auto',
 };
 
 export default {
@@ -463,6 +478,8 @@ export default {
 
             projectMapping: JSON.parse(window.localStorage.getItem('projectMapping') || '[]')
                 .filter(([s, j]) => s.length || j.length),
+
+            themeOptions: themeSelector.themes,
 
             id: null,
             date: new Date(),
@@ -668,6 +685,9 @@ export default {
             }
             return inputs;
         },
+        theme () {
+            return this.settings.theme ?? 'auto';
+        },
     },
     watch: {
         user () {
@@ -816,6 +836,12 @@ export default {
             handler (mapping) {
                 window.localStorage.setItem('projectMapping', JSON.stringify(mapping));
             }
+        },
+        theme: {
+            immediate: true,
+            handler (theme) {
+                themeSelector.setTheme(theme);
+            },
         },
     },
     methods: {
@@ -1630,6 +1656,7 @@ export default {
                     .forEach(id => this.fetchUnknownProject(id));
             }
         });
+        themeSelector.watchPreferredColorScheme(() => this.theme);
     },
     created () {
         document.addEventListener('visibilitychange', this.onVisibilityChange);

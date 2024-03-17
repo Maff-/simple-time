@@ -17,7 +17,7 @@
                 <span v-for="(details, day) in submitDayStatus"
                       :key="day"
                       class="badge submit-status"
-                      :class="{'bg-gray text-dark': details.status === 'submitted' || (details.inFuture && !details.loggedHours), 'bg-danger': details.status === 'no_registrations', 'bg-success': details.status === 'yet_to_turn_in' && details.loggedHours >= details.hours, 'bg-warning': details.status === 'yet_to_turn_in' && details.loggedHours < details.hours}"
+                      :class="{'text-bg-gray': details.status === 'submitted' || (details.inFuture && !details.loggedHours), 'bg-danger': details.status === 'no_registrations', 'bg-success': details.status === 'yet_to_turn_in' && details.loggedHours >= details.hours, 'bg-warning': details.status === 'yet_to_turn_in' && details.loggedHours < details.hours}"
                       :title="`status: ${details.status}; ${(details.loggedHours || 0).toFixed(2)} of ${(details.hours || 0).toFixed(2)} hours logged. (Click to navigate)`"
                       :style="!disableNavigation ? 'cursor: pointer;' : null"
                       @click="!disableNavigation ? navigateDate(details.date): null"

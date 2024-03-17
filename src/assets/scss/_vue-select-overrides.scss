@@ -1,6 +1,8 @@
 @use 'sass:math';
 
 $vs-selected-padding-x: math.div($input-padding-x-sm, 2) !default;
+$vs-deselect-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$body-secondary-color}'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/></svg>");
+$vs-deselect-indicator-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$body-secondary-color-dark}'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/></svg>");
 
 .vs__dropdown-toggle {
   padding-bottom: $input-padding-y !important;
@@ -65,6 +67,46 @@ $vs-selected-padding-x: math.div($input-padding-x-sm, 2) !default;
   right: 0;
 }
 
+// Globally replace vue-select indicator with bootstrap's select indicator. (w/o need of slots)
+.vs__open-indicator {
+  > * {
+    display: none;
+  }
+  background-image: #{escape-svg($form-select-indicator)}, var(--#{$prefix}form-select-bg-icon, none);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: $form-select-bg-size;
+}
+.vs__deselect {
+  svg {
+    display: none;
+  }
+  background-image: #{escape-svg($vs-deselect-indicator)};
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 10px 10px;
+  width: 10px;
+  height: 10px;
+  margin-top: 2px;
+}
+
+// dark mode fixes
+
+.vs__selected, .vs__dropdown-option {
+  color: $input-color;
+}
+
+@if $enable-dark-mode {
+  @include color-mode(dark) {
+    .vs__open-indicator {
+      background-image: #{escape-svg($form-select-indicator-dark)}, var(--#{$prefix}form-select-bg-icon, none);
+    }
+    .vs__deselect {
+      background-image: #{escape-svg($vs-deselect-indicator-dark)};
+    }
+  }
+}
+
 // form states
 
 @mixin vs-form-validation-state(
@@ -73,12 +115,13 @@ $vs-selected-padding-x: math.div($input-padding-x-sm, 2) !default;
   $icon,
   $tooltip-color: color-contrast($color),
   $tooltip-bg-color: rgba($color, $form-feedback-tooltip-opacity),
-  $focus-box-shadow: 0 0 0 $input-focus-width rgba($color, $input-btn-focus-color-opacity)
+  $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($color, $input-btn-focus-color-opacity),
+  $border-color: $color
 ) {
   .vs--single-line {
     @include form-validation-state-selector($state) {
       .vs__dropdown-toggle, .vs__dropdown-menu {
-        border-color: $color;
+        border-color: $border-color;
       }
 
       @if $enable-validation-icons {

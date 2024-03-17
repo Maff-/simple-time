@@ -1,0 +1,12 @@
+@if $enable-dark-mode {
+  @include color-mode(dark) {
+
+    #logged-hours {
+      .progress,
+      .progress-stacked {
+        --#{$prefix}progress-bar-bg: #{$sst-em};
+      }
+    }
+
+  }
+}

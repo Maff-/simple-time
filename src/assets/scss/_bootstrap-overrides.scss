@@ -2,3 +2,16 @@
   cursor: not-allowed;
   pointer-events: auto;
 }
+
+// Dark mode tweaks. (more at _buttons.scss)
+@if $enable-dark-mode {
+  @include color-mode(dark) {
+
+    @include table-variant("light", $dark-bg-subtle-dark);
+
+    .progress-bar.bg-dark {
+      background-color: $sst-pink !important;
+    }
+
+  }
+}

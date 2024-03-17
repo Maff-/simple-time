@@ -1,8 +1,12 @@
+@use "sass:map";
+
 $sst-em: #009bff;
 $sst-bg: #180124;
 $sst-fg: #fff;
 $sst-pink: #ff00eb;
 $sst-purple: #8000ff;
+$sst-dark-purple: #2c0648;
+$sst-soft: #8f7b9e;
 
 $primary: $sst-purple;
 //$info: $sst-em;
@@ -27,10 +31,11 @@ $focus-ring-color: rgba($component-active-bg, $focus-ring-opacity);
 // End 5.0 look tweaks
 
 //// Required
-@import "~bootstrap/scss/functions";
-@import "~bootstrap/scss/variables";
-@import "~bootstrap/scss/mixins";
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
 
+// Add "gray" theme
 $theme-colors: (
   "primary": $primary,
   "secondary": $secondary,
@@ -43,45 +48,124 @@ $theme-colors: (
   "dark": $dark,
 );
 
+// Dark theme tweaks, before '_maps.scss'
+$body-bg-dark: $sst-bg;
+$body-color-dark: $sst-fg;
+$body-secondary-color-dark: $sst-soft;
+$link-color-dark: $sst-pink;
+$dark-bg-subtle-dark: mix($gray-800, $sst-bg);
+
+$info-text-emphasis-dark: $sst-em;
+$info-bg-subtle-dark: transparent;
+$info-border-subtle-dark: $sst-em;
+
+// Bootstrap maps and stuff
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+// Additional "gray" vars (used in alert, list-group and some utility classes)
+// light mode
+$gray-text: $gray-800;
+$gray-bg-subtle: $gray-200;
+$gray-border-subtle: $gray-400;
+$theme-colors-text: map-merge($theme-colors-text, ("gray": $gray-text));
+$theme-colors-bg-subtle: map-merge($theme-colors-bg-subtle, ("gray": $gray-bg-subtle));
+$theme-colors-border-subtle: map-merge($theme-colors-border-subtle, ("gray": $gray-border-subtle));
+
+// dark mode
+$gray-text-dark: $gray-100;
+$gray-bg-subtle-dark: $gray-700;
+$gray-border-subtle-dark: $gray-500;
+@if $enable-dark-mode {
+  $theme-colors-text-dark: map-merge($theme-colors-text-dark, ("gray": $gray-text-dark));
+  $theme-colors-bg-subtle-dark: map-merge($theme-colors-bg-subtle-dark, ("gray": $gray-bg-subtle-dark));
+  $theme-colors-border-subtle-dark: map-merge($theme-colors-border-subtle-dark, ("gray": $gray-border-subtle-dark));
+}
+
+// Add custom "warning" form state
 $form-feedback-warning-color: $warning;
 $form-feedback-icon-warning-color: $form-feedback-warning-color;
 $form-feedback-icon-warning: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='#{$form-feedback-icon-warning-color}'><circle cx='6' cy='6' r='4.5'/><path stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/><circle cx='6' cy='8.2' r='.6' fill='#{$form-feedback-icon-warning-color}' stroke='none'/></svg>") !default;
 
-$form-validation-states: (
-  "valid": (
-    "color": $form-feedback-valid-color,
-    "icon": $form-feedback-icon-valid,
-  ),
-  "invalid": (
-    "color": $form-feedback-invalid-color,
-    "icon": $form-feedback-icon-invalid,
-  ),
+$form-validation-states-additions: (
   "warning": (
     "color": $form-feedback-warning-color,
     "icon": $form-feedback-icon-warning,
+    "tooltip-color": #fff,
+    "tooltip-bg-color": var(--#{$prefix}warning),
+    "focus-box-shadow": 0 0 $input-btn-focus-blur $input-focus-width rgba(var(--#{$prefix}warning-rgb), $input-btn-focus-color-opacity),
+    "border-color": $form-feedback-warning-color,
   )
 );
+$form-validation-states: map.merge($form-validation-states, $form-validation-states-additions);
 
-// Bootstrap and its default variables
+// Bootstrap continued...
+// Layout & components
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+//@import "bootstrap/scss/images";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+//@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/dropdown";
+@import "bootstrap/scss/button-group";
+//@import "bootstrap/scss/nav";
+//@import "bootstrap/scss/navbar";
+//@import "bootstrap/scss/card";
+//@import "bootstrap/scss/accordion";
+//@import "bootstrap/scss/breadcrumb";
+//@import "bootstrap/scss/pagination";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/progress";
+//@import "bootstrap/scss/list-group";
+@import "bootstrap/scss/close";
+//@import "bootstrap/scss/toasts";
+@import "bootstrap/scss/modal";
+//@import "bootstrap/scss/tooltip";
+//@import "bootstrap/scss/popover";
+//@import "bootstrap/scss/carousel";
+//@import "bootstrap/scss/spinners";
+//@import "bootstrap/scss/offcanvas";
+//@import "bootstrap/scss/placeholders";
+// Helpers
+@import "bootstrap/scss/helpers";
+// Utilities
+@import "bootstrap/scss/utilities/api";
 
-//// Optional
-//@import "~bootstrap/scss/root";
-//@import "~bootstrap/scss/reboot";
-//@import "~bootstrap/scss/type";
-
-@import "~bootstrap/scss/bootstrap";
-
+//$vs-component-bg: none !default;
 $vs-component-line-height: $input-line-height;
 $vs-component-placeholder-color: $input-placeholder-color;
 
 $vs-state-active-bg: $dropdown-link-hover-bg;
 $vs-state-active-color: inherit;
 
+//$vs-state-deselect-bg: #fb5858 !default;
+//$vs-state-deselect-color: #fff !default;
+
+$vs-state-disabled-bg: $form-select-disabled-bg;
+$vs-state-disabled-color: $form-select-disabled-color;
+$vs-state-disabled-controls-color: $form-select-indicator-color;
+//$vs-state-disabled-cursor: not-allowed !default;
+
 $vs-border-width: $input-border-width;
+$vs-border-style: solid !default;
 $vs-border-radius: $input-border-radius;
 $vs-border-color: $input-border-color;
 
 $vs-controls-color: $input-placeholder-color;
+$vs-controls-size: 1;
+$vs-controls-deselect-text-shadow: none;
+
+$vs-selected-bg: $input-disabled-bg;
+$vs-selected-border-color: $input-disabled-border-color;
+//$vs-selected-border-style: $vs-border-style !default;
+//$vs-selected-border-width: $vs-border-width !default;
 
 //$vs-dropdown-z-index: 1000 !default;
 $vs-dropdown-min-width: $dropdown-min-width;
@@ -89,7 +173,7 @@ $vs-dropdown-min-width: $dropdown-min-width;
 $vs-dropdown-box-shadow: $dropdown-box-shadow;
 $vs-dropdown-bg: $dropdown-bg;
 
-@import '~vue-select/src/scss/vue-select';
+@import 'vue-select/src/scss/vue-select';
 @import 'vue-select-overrides';
 
 @import "loading";
@@ -100,3 +184,13 @@ $vs-dropdown-bg: $dropdown-bg;
 @import "buttons";
 @import "submit-status";
 @import "title-help";
+@import "logged-hours";
+
+// Tweak main tile in dark mode
+@if $enable-dark-mode {
+  @include color-mode(dark) {
+    h1.text-muted {
+      color: unset !important;
+    }
+  }
+}

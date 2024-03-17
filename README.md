@@ -82,7 +82,6 @@ While this tools has been in use at the company since early 2022, there are stil
 * Weekly hours target per project.
 * Bulk edit. (To quickly fix wrong date, hour type, etc of multiple entries at once).
 * Optional compact interface mode. (Use something like Stylebot and/or Tampermonkey in the meanwhile).
-* Dark mode 😎.
 * Technical improvements; refactor, abstraction, TypeScript, Vue3, ...
 * See all TODOs and FIXMEs.
 

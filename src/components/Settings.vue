@@ -1,6 +1,12 @@
 <template>
     <form class="row g-3">
         <div class="col-12">
+            <label for="theme" class="form-label">Color Theme</label>
+            <select v-model="value.theme" id="theme" class="form-control">
+                <option v-for="(details, option) in themeOptions" :key="option" :value="option">{{ details.label }}</option>
+            </select>
+        </div>
+        <div class="col-12">
             <div class="form-check">
                 <input type="checkbox" v-model="value.pickDate" id="pickDate" class="form-check-input">
                 <label for="pickDate" class="form-check-label">
@@ -189,8 +195,15 @@
 </template>
 
 <script>
+import themeSelector from '@/lib/themeSelector';
+
 export default {
     name: 'Settings',
+    data: () => {
+        return {
+            themeOptions: themeSelector.themes,
+        };
+    },
     props: {
         value: {
             type: Object,

@@ -20,3 +20,21 @@ $btn-border-radius-xs: $badge-border-radius;
   cursor: if($enable-button-pointers, pointer, null);
   user-select: none;
 }
+
+.btn-tertiary {
+  @include button-variant($body-tertiary-bg, $body-tertiary-bg);
+}
+
+@if $enable-dark-mode {
+  @include color-mode(dark) {
+
+    .btn-tertiary {
+      @include button-variant($body-tertiary-bg-dark, $body-tertiary-bg-dark);
+    }
+
+    .btn-gray {
+      @include button-variant($gray-bg-subtle-dark, $gray-bg-subtle-dark);
+    }
+
+  }
+}
