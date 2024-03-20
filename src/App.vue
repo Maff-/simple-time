@@ -15,19 +15,19 @@
 
         <section class="row g-3 mb-3">
             <div class="col-auto" v-if="settings.pickDate && settings.showDateNav">
-                <button type="button" @click="prevDay" class="btn btn-gray" tabindex="1-"><i class="bi-arrow-left"></i></button>
+                <button type="button" id="prev-day" @click="prevDay" class="btn btn-gray" tabindex="1-"><i class="bi-arrow-left"></i></button>
             </div>
             <div class="col" v-if="settings.pickDate">
               <div class="input-group">
                 <span class="input-group-text font-monospace">{{ day }}</span>
-                <input type="date" :value="dateValue" @input="onDateInput" :class="{'is-warning': !isToday}" class="form-control" tabindex="-1" :title="!isToday ? 'Look out! You\'re working on another day.' : null">
+                <input type="date" id="date-input" :value="dateValue" @input="onDateInput" :class="{'is-warning': !isToday}" class="form-control" tabindex="-1" :title="!isToday ? 'Look out! You\'re working on another day.' : null">
               </div>
             </div>
             <div class="col-auto" v-if="settings.pickDate">
-                <button type="button" @click="setToday" :disabled="isToday" class="btn btn-secondary">Today</button>
+                <button type="button" id="today" @click="setToday" :disabled="isToday" class="btn btn-secondary">Today</button>
             </div>
             <div class="col-auto" v-if="settings.pickDate && settings.showDateNav">
-                <button type="button" @click="nextDay" class="btn btn-gray" tabindex="1-"><i class="bi-arrow-right"></i></button>
+                <button type="button" id="next-day" @click="nextDay" class="btn btn-gray" tabindex="1-"><i class="bi-arrow-right"></i></button>
             </div>
             <div class="col-12" v-if="!settings.pickDate && !isToday">
                 <div class="alert alert-sm alert-warning mb-0 py-2" role="alert">
@@ -37,6 +37,7 @@
 
             <div class="col-12">
                 <v-select
+                    uid="project-selector"
                     ref="projectSelector"
                     class="vs--single-line"
                     @hook:mounted="onSelectMounted('projectSelector')"
@@ -66,6 +67,7 @@
             </div>
             <div class="col-sm-4 col-md-5">
                 <v-select
+                    uid="service-selector"
                     ref="serviceSelector"
                     class="vs--single-line"
                     :class="{'is-warning': higherPriorityServiceAvailable}"
@@ -94,6 +96,7 @@
             </div>
             <div class="col-sm-4 col-md-5">
                 <v-select
+                    uid="hours-type-selector"
                     ref="hoursTypeSelector"
                     class="vs--single-line"
                     :class="{'is-warning': higherPriorityHoursTypeAvailable}"
@@ -123,6 +126,7 @@
             </div>
             <div class="col-sm-4 col-md-2">
                 <hours-input
+                    id="hours-input"
                     ref="hoursInput"
                     v-model="hours"
                     :display-mode="settings.hoursDisplayMode"
@@ -132,6 +136,7 @@
             <div class="col-sm-6" v-for="inputName in inputOrder" :key="inputName">
                 <v-select
                     v-if="inputName === 'jiraIssue'"
+                    uid="jira-issue-selector"
                     ref="jiraIssueSelector"
                     class="vs--single-line"
                     @hook:mounted="onSelectMounted('jiraIssueSelector')"
@@ -166,6 +171,7 @@
                 </v-select>
                 <input type="text"
                        v-if="inputName === 'comment'"
+                       id="comment-input"
                        ref="commentInput"
                        placeholder="Description"
                        v-model.trim="comment"
@@ -173,17 +179,17 @@
                        class="form-control">
             </div>
             <div class="col-6 col-sm-4 col-md-6 order-4">
-                <button type="submit" @click="submit()" :disabled="!isValid || submitting" :class="id ? 'btn-warning' : 'btn-primary'" class="btn d-block w-100">
+                <button type="submit" id="submit" @click="submit()" :disabled="!isValid || submitting" :class="id ? 'btn-warning' : 'btn-primary'" class="btn d-block w-100">
                     {{ id ? 'Submit changes' : 'Submit' }}
                 </button>
             </div>
             <div class="col-6 col-sm-4 col-md-3 order-4">
-                <button type="submit" @click="submitAndClear" :disabled="!isValid || submitting" :class="id ? 'btn-warning' : 'btn-primary'" class="btn btn-primary d-block w-100">
+                <button type="submit" id="submit-clear" @click="submitAndClear" :disabled="!isValid || submitting" :class="id ? 'btn-warning' : 'btn-primary'" class="btn btn-primary d-block w-100">
                     {{ id ? 'Submit changes & clear' : 'Submit & clear' }}
                 </button>
             </div>
             <div class="col-sm-4 col-md-3 order-4">
-                <button type="reset" @click="clear" :disabled="submitting" class="btn btn-secondary d-block w-100">
+                <button type="reset" id="clear" @click="clear" :disabled="submitting" class="btn btn-secondary d-block w-100">
                     {{ id ? 'Cancel' : 'Clear' }}
                 </button>
             </div>
