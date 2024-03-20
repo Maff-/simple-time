@@ -93,7 +93,18 @@ $vs-deselect-indicator-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.o
 // dark mode fixes
 
 .vs__selected, .vs__dropdown-option {
-  color: $input-color;
+  color: $input-color; // override hardcoded color #333
+}
+
+// re-apply default colors, as above has higher priority
+.vs__dropdown-option--highlight {
+  color: $vs-state-active-color;
+}
+.vs__dropdown-option--deselect {
+  color: $vs-state-deselect-color;
+}
+.vs__dropdown-option--disabled {
+  color: $vs-state-disabled-color;
 }
 
 @if $enable-dark-mode {
