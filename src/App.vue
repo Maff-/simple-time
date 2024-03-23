@@ -50,7 +50,7 @@
                     :filter="filterProjects"
                     :selectable="p => !p.disabled"
                     :threshold="0.1"
-                    :map-keydown="vSelectHandlers"
+                    :select-on-tab="true"
                     autofocus
                 >
                     <template #option="option">
@@ -79,7 +79,7 @@
                     :options="prioritizedServices"
                     label="name"
                     :reduce="s => s.id"
-                    :map-keydown="vSelectHandlers"
+                    :select-on-tab="true"
                 >
                     <template #option="option">
                         {{ option.name }}
@@ -107,7 +107,7 @@
                     v-model="hoursType"
                     :options="prioritizedHoursTypes"
                     :reduce="h => h.id"
-                    :map-keydown="vSelectHandlers"
+                    :select-on-tab="true"
                 >
                     <template #option="option">
                         <span class="color-label" :style="{ backgroundColor: option.color }"></span>
@@ -146,7 +146,7 @@
                     :reduce="i => i.key"
                     :filter="filterJiraSearch"
                     @search="onJiraSearch"
-                    :map-keydown="vSelectHandlers"
+                    :select-on-tab="true"
                     :disabled="!jiraUser"
                 >
                     <template #option="option">
@@ -851,16 +851,6 @@ export default {
         },
     },
     methods: {
-        vSelectHandlers (map, vm) {
-            return {
-                ...map,
-                9: () => {
-                    // 'select on tab' behaviour, but only when open.
-                    // accounts for change in https://github.com/sagalbot/vue-select/pull/1727
-                    return !vm.isComposing && vm.open && vm.typeAheadSelect();
-                },
-            };
-        },
         confirmLogout() {
             if (window.confirm('Are you sure you want to log out from Simplicate?\n\nThis will require you to re-authorize this application if you want use it again.\n\n\nPlease note this does not revoke the application authorization or api key, it merely removes the locally stored user/auth information. Revoking api/app access can be done in the Simplicate interface.')) {
                 this.logout();

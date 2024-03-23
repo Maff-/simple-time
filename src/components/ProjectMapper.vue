@@ -20,7 +20,7 @@
                     :selectable="selectableCb(simplicate)"
                     label="name"
                     :reduce="p => p.id"
-                    :map-keydown="vSelectHandlers"
+                    :select-on-tab="true"
                     :clear-search-on-blur="() => true"
                     :clear-search-on-select="false"
                     :close-on-select="false"
@@ -51,7 +51,7 @@
                     :selectable="selectableCb(jira)"
                     label="name"
                     :reduce="p => p.id"
-                    :map-keydown="vSelectHandlers"
+                    :select-on-tab="true"
                     :clear-search-on-blur="() => true"
                     :clear-search-on-select="false"
                     :close-on-select="false"
@@ -104,16 +104,6 @@ export default {
         };
     },
     methods: {
-        vSelectHandlers (map, vm) {
-            return {
-                ...map,
-                9: () => {
-                    // 'select on tab' behaviour, but only when open.
-                    // accounts for change in https://github.com/sagalbot/vue-select/pull/1727
-                    return !vm.isComposing && vm.open && vm.typeAheadSelect();
-                },
-            };
-        },
         // TODO: stop modifying value prop directly
         addNew () {
             this.value.push([[],[]]);
