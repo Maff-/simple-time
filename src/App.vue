@@ -1110,8 +1110,8 @@ export default {
         },
         onSelectMounted(ref) {
             // Prevent tabbing to the clear button of the vue-select input
-            const $ref = this.$refs[ref];
-            if ($ref.$refs !== undefined && $ref.$refs.clearButton !== undefined) {
+            const $ref = this.$refs[ref][0] ?? this.$refs[ref];
+            if ($ref?.$refs?.clearButton) {
                 $ref.$refs.clearButton.tabIndex = -1;
             }
         },
@@ -1639,10 +1639,12 @@ export default {
             this.$refs.hoursInput.focus();
         },
         focusJiraIssueSelect () {
-            this.$refs.jiraIssueSelector.$refs.search.focus();
+            // check for array, due to v-for
+            (this.$refs.jiraIssueSelector[0] ?? this.$refs.jiraIssueSelector).$refs.search.focus();
         },
         focusCommentInput () {
-            this.$refs.commentInput.focus();
+            // check for array, due to v-for
+            (this.$refs.commentInput[0] ?? this.$refs.commentInput).focus();
         },
         getSettingsModal () {
             return Modal.getInstance(this.$refs.settingsModal)
