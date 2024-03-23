@@ -11,6 +11,8 @@
         <div v-for="([simplicate, jira], index) in value" :key="index" class="row mt-3">
             <div class="col">
                 <v-select
+                    :uid="`pm-simplicate-project-selector-${index}`"
+                    :input-id="`pm-simplicate-project-search-${index}`"
                     placeholder="Simplicate Project"
                     multiple
                     required
@@ -42,6 +44,8 @@
             </div>
             <div class="col">
                 <v-select
+                    :uid="`pm-jira-project-selector-${index}`"
+                    :input-id="`pm-jira-project-search-${index}`"
                     placeholder="Jira Project"
                     multiple
                     required

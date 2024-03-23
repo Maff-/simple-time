@@ -38,6 +38,7 @@
             <div class="col-12">
                 <v-select
                     uid="project-selector"
+                    input-id="project-search"
                     ref="projectSelector"
                     class="vs--single-line"
                     @hook:mounted="onSelectMounted('projectSelector')"
@@ -68,6 +69,7 @@
             <div class="col-sm-4 col-md-5">
                 <v-select
                     uid="service-selector"
+                    input-id="service-search"
                     ref="serviceSelector"
                     class="vs--single-line"
                     :class="{'is-warning': higherPriorityServiceAvailable}"
@@ -97,6 +99,7 @@
             <div class="col-sm-4 col-md-5">
                 <v-select
                     uid="hours-type-selector"
+                    input-id="hours-type-search"
                     ref="hoursTypeSelector"
                     class="vs--single-line"
                     :class="{'is-warning': higherPriorityHoursTypeAvailable}"
@@ -137,6 +140,7 @@
                 <v-select
                     v-if="inputName === 'jiraIssue'"
                     uid="jira-issue-selector"
+                    input-id="jira-issue-search"
                     ref="jiraIssueSelector"
                     class="vs--single-line"
                     @hook:mounted="onSelectMounted('jiraIssueSelector')"
