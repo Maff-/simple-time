@@ -14,7 +14,7 @@
     "core-js": "^3.36.0",
     "fuse.js": "^7.0.0",
     "vue": "^2.7.16",
-    "vue-select": "^3.20.2"
+    "vue-select": "^3.20.0 <3.20.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
