@@ -43,6 +43,10 @@
             <div class="row">
                 <div class="col">
                     <div class="shortcut">
+                        <kbd>Alt</kbd> + <kbd>a</kbd>
+                        Focus <em>Date</em> input.
+                    </div>
+                    <div class="shortcut">
                         <kbd>Alt</kbd> + <kbd>p</kbd>
                         Focus <em>Project</em> selector.
                     </div>

@@ -20,7 +20,7 @@
             <div class="col" v-if="settings.pickDate">
               <div class="input-group">
                 <span class="input-group-text font-monospace">{{ day }}</span>
-                <input type="date" id="date-input" :value="dateValue" @input="onDateInput" :class="{'is-warning': !isToday}" class="form-control" tabindex="-1" :title="!isToday ? 'Look out! You\'re working on another day.' : null">
+                <input type="date" id="date-input" ref="dateInput" :value="dateValue" @input="onDateInput" :class="{'is-warning': !isToday}" class="form-control" tabindex="-1" :title="!isToday ? 'Look out! You\'re working on another day.' : null">
               </div>
             </div>
             <div class="col-auto" v-if="settings.pickDate">
@@ -1071,6 +1071,9 @@ export default {
                 if (this.getSettingsModal()._isShown) {
                     this.getSettingsModal().hide();
                 }
+            } else if (event.key === 'a' && (event.altKey || event.target === document.body)) {
+                event.preventDefault();
+                this.focusDateInput();
             } else if (event.key === 'p' && (event.altKey || event.target === document.body)) {
                 event.preventDefault();
                 this.focusProjectSelect();
@@ -1619,6 +1622,9 @@ export default {
         },
         prevDay () {
             this.stepDate(-1);
+        },
+        focusDateInput () {
+            this.$refs.dateInput.focus();
         },
         focusProjectSelect () {
             this.$refs.projectSelector.$refs.search.focus();
