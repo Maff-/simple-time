@@ -41,11 +41,13 @@
                     input-id="project-search"
                     ref="projectSelector"
                     class="vs--single-line"
+                    :class="{'is-warning': settings.warnAboutUnmappedProject && projectIsUnmapped}"
+                    :title="settings.warnAboutUnmappedProject && projectIsUnmapped ? 'Project has no mapping, this might result in reduced Jira issue search.' : null"
                     @hook:mounted="onSelectMounted('projectSelector')"
                     placeholder="Project"
                     required
                     v-model="project"
-                    :options="projects"
+                    :options="projectOptions"
                     label="name"
                     :reduce="p => p.id"
                     :filter="filterProjects"
@@ -58,11 +60,13 @@
                         <code class="me-2">{{ option.project_number }}</code>
                         <span class="me-2">{{ option.project_name.replace(/\s*\(\d+\)$/, '') }}</span>
                         <span class="text-muted">{{ option.organization ? option.organization.name : '' }}</span>
+                        <i v-if="settings.warnAboutUnmappedProject && option.mapped" class="bi-arrows text-body-tertiary ms-1" title="Mapped project"></i>
                     </template>
                     <template #selected-option="option">
                         <code class="me-2">{{ option.project_number }}</code>
                         <span class="me-2">{{ option.project_name.replace(/\s*\(\d+\)$/, '') }}</span>
                         <span class="text-muted">{{ option.organization ? option.organization.name : '' }}</span>
+                        <i v-if="settings.warnAboutUnmappedProject && option.mapped" class="bi-arrows text-body-tertiary ms-1" title="Mapped project"></i>
                     </template>
                 </v-select>
             </div>
@@ -444,6 +448,7 @@ const defaultSettings = {
     autofocusProjectSelect: false,
     focusPostSubmit: true,
     hoursDisplayMode: 'hm',
+    warnAboutUnmappedProject: false,
     preferredServiceRegex: null,
     preferredHoursTypeRegex: null,
     jiraSetStarted: true,
@@ -587,6 +592,15 @@ export default {
                 jiraIssue: this.jiraIssue,
                 comment: this.comment,
             };
+        },
+        projectOptions () {
+            return this.projects.map((p) => {
+                p.mapped = this.projectMapping && this.projectMapping.some(([s,]) => s.includes(p.id));
+                return p;
+            });
+        },
+        projectIsUnmapped () {
+            return this.project && this.projectMapping && !this.projectMapping.some(([s,]) => s.includes(this.project));
         },
         jiraProjectsSelected () {
             if (this.project && this.projectMapping) {

@@ -69,6 +69,14 @@
             </div>
         </div>
         <div class="col-12">
+            <div class="form-check">
+                <input type="checkbox" v-model="value.warnAboutUnmappedProject" id="warnAboutUnmappedProject" class="form-check-input">
+                <label for="warnAboutUnmappedProject" class="form-check-label">
+                    Warn about selected 'unmapped' project.
+                </label>
+            </div>
+        </div>
+        <div class="col-12">
             <label for="hoursDisplayMode" class="form-label">Hours display mode</label>
             <select v-model="value.hoursDisplayMode" id="hoursDisplayMode" class="form-control">
                 <option value="hm">2h 15m</option>
