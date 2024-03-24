@@ -1,11 +1,30 @@
 @use 'sass:math';
 
 $vs-selected-padding-x: math.div($input-padding-x-sm, 2) !default;
+$vs-deselect-indicator-size: 16px;
 $vs-deselect-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$body-secondary-color}'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/></svg>");
 $vs-deselect-indicator-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$body-secondary-color-dark}'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/></svg>");
 
+$vs-clear-indicator-size: 16px;
+$vs-clear-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$body-secondary-color}'><path d='M6.586 8 1.293 2.707a1 1 0 0 1 1.414-1.414L8 6.586l5.293-5.293a1 1 0 0 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8Z'/></svg>");
+$vs-clear-indicator-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$body-secondary-color-dark}'><path d='M6.586 8 1.293 2.707a1 1 0 0 1 1.414-1.414L8 6.586l5.293-5.293a1 1 0 0 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8Z'/></svg>");
+
 .vs__dropdown-toggle {
   padding-bottom: $input-padding-y !important;
+  @include box-shadow($form-select-box-shadow);
+}
+
+.vs--open {
+  .vs__dropdown-toggle,
+  .vs__dropdown-menu {
+    border-color: $form-select-focus-border-color;
+    //@if $enable-shadows {
+    //  @include box-shadow($form-select-box-shadow, $form-select-focus-box-shadow);
+    //} @else {
+    //  // Avoid using mixin so we can pass custom focus shadow properly
+    //  box-shadow: $form-select-focus-box-shadow;
+    //}
+  }
 }
 
 .vs__selected,
@@ -67,27 +86,42 @@ $vs-deselect-indicator-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.o
   right: 0;
 }
 
-// Globally replace vue-select indicator with bootstrap's select indicator. (w/o need of slots)
+// Globally replace vue-select indicator with bootstrap's select indicator.
 .vs__open-indicator {
-  > * {
-    display: none;
-  }
   background-image: #{escape-svg($form-select-indicator)}, var(--#{$prefix}form-select-bg-icon, none);
   background-repeat: no-repeat;
   background-position: center;
   background-size: $form-select-bg-size;
+  width: $vs-deselect-indicator-size;
+  height: $vs-deselect-indicator-size;
+  // Disable rotation transition
+  //@if not $enable-transitions {
+    transition: none;
+  //}
 }
-.vs__deselect {
-  svg {
-    display: none;
-  }
-  background-image: #{escape-svg($vs-deselect-indicator)};
+// Disable indicator rotation, like form-select
+.vs--open .vs__open-indicator {
+  transform: unset;
+}
+
+.vs__deselect, .vs__clear {
   background-repeat: no-repeat;
   background-position: center;
+}
+
+.vs__deselect {
+  background-image: #{escape-svg($vs-deselect-indicator)};
   background-size: 10px 10px;
   width: 10px;
   height: 10px;
   margin-top: 2px;
+}
+
+.vs__clear {
+  background-image: #{escape-svg($vs-clear-indicator)};
+  background-size: $form-select-bg-size;
+  width: $vs-clear-indicator-size;
+  height: $vs-clear-indicator-size;
 }
 
 // dark mode fixes
@@ -114,6 +148,9 @@ $vs-deselect-indicator-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.o
     }
     .vs__deselect {
       background-image: #{escape-svg($vs-deselect-indicator-dark)};
+    }
+    .vs__clear {
+      background-image: #{escape-svg($vs-clear-indicator-dark)};
     }
   }
 }

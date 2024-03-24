@@ -20,6 +20,8 @@ $component-active-bg: #ced4da; // gray-400
 $badge-padding-x: .5em;
 
 // Start tweaks to make Bootstrap 5.3 look more like 5.0
+//$enable-shadows: true;
+
 $border-radius: .25rem;
 $border-radius-sm: .2rem;
 $border-radius-lg: .3rem;
@@ -170,6 +172,7 @@ $vs-selected-border-color: $input-disabled-border-color;
 //$vs-dropdown-z-index: 1000 !default;
 $vs-dropdown-min-width: $dropdown-min-width;
 //$vs-dropdown-max-height: 350px !default;
+//$vs-dropdown-box-shadow: none;
 $vs-dropdown-box-shadow: $dropdown-box-shadow;
 $vs-dropdown-bg: $dropdown-bg;
 
