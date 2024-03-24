@@ -32,6 +32,8 @@ $focus-ring-opacity: 0.25;
 $focus-ring-color: rgba($component-active-bg, $focus-ring-opacity);
 // End 5.0 look tweaks
 
+$font-size-root: 1rem; // let bs create the --bs-root-font-size var
+
 //// Required
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
@@ -188,6 +190,7 @@ $vs-dropdown-bg: $dropdown-bg;
 @import "submit-status";
 @import "title-help";
 @import "logged-hours";
+@import "sizing";
 
 // Tweak main tile in dark mode
 @if $enable-dark-mode {

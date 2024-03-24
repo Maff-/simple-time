@@ -9,6 +9,11 @@ $vs-clear-indicator-size: 16px;
 $vs-clear-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$body-secondary-color}'><path d='M6.586 8 1.293 2.707a1 1 0 0 1 1.414-1.414L8 6.586l5.293-5.293a1 1 0 0 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8Z'/></svg>");
 $vs-clear-indicator-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$body-secondary-color-dark}'><path d='M6.586 8 1.293 2.707a1 1 0 0 1 1.414-1.414L8 6.586l5.293-5.293a1 1 0 0 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8Z'/></svg>");
 
+.v-select {
+  font-family: $form-select-font-family;
+  @include font-size($form-select-font-size);
+}
+
 .vs__dropdown-toggle {
   padding-bottom: $input-padding-y !important;
   @include box-shadow($form-select-box-shadow);
@@ -187,4 +192,41 @@ $vs-clear-indicator-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/
 
 @each $state, $data in $form-validation-states {
   @include vs-form-validation-state($state, $data...);
+}
+
+.v-select-sm {
+  font-size: $form-select-font-size-sm;
+
+  .vs__dropdown-toggle {
+    padding-bottom: $input-padding-y-sm !important;
+  }
+
+  .vs__selected,
+  .vs__search, .vs__search:focus {
+    margin-top: $input-padding-y-sm !important;
+  }
+
+  .vs__actions {
+    padding-top: $input-padding-y-sm !important;
+    padding-left: math.div($input-padding-x-sm, 2) !important;
+    padding-right: $input-padding-x-sm !important;
+  }
+
+  .vs__selected-options {
+    padding-left: $input-padding-x - $vs-selected-padding-x !important;
+  }
+
+  .vs--single {
+    .vs__selected-options {
+      padding-left: $input-padding-x-sm !important;
+    }
+  }
+
+  .vs--single-line .vs__selected {
+    left: $input-padding-x-sm;
+  }
+
+  .vs__clear {
+    margin-right: $input-padding-y-sm;
+  }
 }

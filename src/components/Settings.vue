@@ -1,9 +1,15 @@
 <template>
     <form class="row g-3">
-        <div class="col-12">
+        <div class="col-12 col-md-6">
             <label for="theme" class="form-label">Color Theme</label>
-            <select v-model="value.theme" id="theme" class="form-control">
+            <select v-model="value.theme" id="theme" class="form-select">
                 <option v-for="(details, option) in themeOptions" :key="option" :value="option">{{ details.label }}</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-6">
+            <label for="theme" class="form-label">Font sizes & spacing</label>
+            <select v-model="value.sizing" id="sizing" class="form-select">
+                <option v-for="option in ['small', 'dense', 'medium', 'regular']" :key="option" :value="option">{{ option }}</option>
             </select>
         </div>
         <div class="col-12">
@@ -78,7 +84,7 @@
         </div>
         <div class="col-12">
             <label for="hoursDisplayMode" class="form-label">Hours display mode</label>
-            <select v-model="value.hoursDisplayMode" id="hoursDisplayMode" class="form-control">
+            <select v-model="value.hoursDisplayMode" id="hoursDisplayMode" class="form-select">
                 <option value="hm">2h 15m</option>
                 <option value="clock">2:15</option>
                 <option value="decimal">2.25</option>

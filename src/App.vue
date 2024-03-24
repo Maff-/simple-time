@@ -459,6 +459,7 @@ const defaultSettings = {
     hideLoggedService: false,
     hideLoggedType: false,
     theme: 'auto',
+    sizing: 'regular',
 };
 
 export default {
@@ -712,6 +713,9 @@ export default {
         theme () {
             return this.settings.theme ?? 'auto';
         },
+        sizing () {
+            return this.settings.sizing ?? 'regular';
+        },
     },
     watch: {
         user () {
@@ -865,6 +869,12 @@ export default {
             immediate: true,
             handler (theme) {
                 themeSelector.setTheme(theme);
+            },
+        },
+        sizing: {
+            immediate: true,
+            handler (size) {
+                document.documentElement.setAttribute('data-app-sizing', size);
             },
         },
     },

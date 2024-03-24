@@ -1,0 +1,105 @@
+[data-app-sizing="small"] {
+  --bs-root-font-size: 14px;
+}
+
+[data-app-sizing="small"],
+[data-app-sizing="dense"] {
+  .row {
+    --#{$prefix}gutter-x: 1rem;
+  }
+  @if $enable-grid-classes {
+    // TODO: loop $gutters??
+    .g-3 {
+      @extend .g-2;
+    }
+    .gx-3 {
+      @extend .gx-2;
+    }
+    .gy-3 {
+      @extend .gy-2;
+    }
+  }
+  .mt-3 {
+    @extend .mt-2;
+  }
+  .mb-3 {
+    @extend .mb-2;
+  }
+  .my-3 {
+    @extend .my-2;
+  }
+  .alert {
+    --#{$prefix}alert-padding-x: .75rem;
+    --#{$prefix}alert-padding-y: .5rem;
+    --#{$prefix}alert-margin-bottom: .75rem;
+  }
+  .table {
+    @extend .table-sm;
+  }
+  .btn:not(.btn-sm):not(.btn-xs) {
+    //@extend .btn-sm;
+    --#{$prefix}btn-padding-y: .25rem;
+    //--#{$prefix}btn-padding-x: $btn-padding-x-sm;
+  }
+  .btn-sm {
+    @extend .btn-xs;
+    --#{$prefix}btn-font-size: 1rem;
+    --#{$prefix}btn-padding-x: .25rem;
+    &.ms-1 {
+      margin-left: 0 !important;
+    }
+  }
+  .btn-xs {
+    //...
+  }
+  .input-group {
+    @extend .input-group-sm;
+  }
+  .form-control {
+    @extend .form-control-sm;
+  }
+  .form-select {
+    @extend .form-select-sm;
+  }
+  .v-select {
+    @extend .v-select-sm;
+  }
+  .input-group > .form-control,
+  .input-group > .input-group-text,
+  .form-control,
+  .form-select,
+  .v-select {
+    font-size: unset;
+  }
+  hr {
+    margin: .75rem 0;
+  }
+  h1 {
+    @include font-size(2rem);
+  }
+  .shortcuts-help-content {
+    section + section {
+      margin-top: map-get($spacers, 3);
+    }
+    section > header {
+      margin-bottom: 0;
+    }
+  }
+}
+
+[data-app-sizing="dense"] {
+  --bs-root-font-size: 15px;
+}
+
+[data-app-sizing="medium"] {
+  --bs-root-font-size: 15px;
+  .g-3, .gy-3 {
+    --#{$prefix}gutter-y: .75rem;
+  }
+  .table {
+    @extend .table-sm;
+  }
+  h1 {
+    @include font-size(2rem);
+  }
+}
