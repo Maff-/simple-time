@@ -7,6 +7,7 @@
            @change="onInput($event.target.value)"
            @keydown.prevent.stop.up="increaseValue($event)"
            @keydown.prevent.stop.down="decreaseValue($event)"
+           autocomplete="off"
     >
 </template>
 
