@@ -59,6 +59,10 @@
                         Focus <em>Hours Type</em> selector.
                     </div>
                     <div class="shortcut">
+                        <kbd>Alt</kbd> + <kbd>h</kbd>
+                        Focus <em>Hours</em> input.
+                    </div>
+                    <div class="shortcut">
                         <kbd>Alt</kbd> + <kbd>j</kbd>
                         Focus <em>Jira Issue</em> selector.
                     </div>

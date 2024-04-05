@@ -1107,6 +1107,9 @@ export default {
             } else if (event.key === 'u' && (event.altKey || event.target === document.body)) {
                 event.preventDefault();
                 this.focusHoursTypeSelect();
+            } else if (event.key === 'h' && (event.altKey || event.target === document.body)) {
+                event.preventDefault();
+                this.focusHoursInput();
             } else if (event.key === 'j' && (event.altKey || event.target === document.body)) {
                 event.preventDefault();
                 this.focusJiraIssueSelect();
