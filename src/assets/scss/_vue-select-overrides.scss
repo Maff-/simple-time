@@ -30,6 +30,9 @@ $vs-clear-indicator-dark: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/
     //  box-shadow: $form-select-focus-box-shadow;
     //}
   }
+  .vs__dropdown-toggle {
+    box-shadow: $form-select-focus-box-shadow;
+  }
 }
 
 .vs__selected,
