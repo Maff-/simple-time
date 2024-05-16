@@ -1,7 +1,3 @@
-[data-app-sizing="small"] {
-  --bs-root-font-size: 14px;
-}
-
 [data-app-sizing="small"],
 [data-app-sizing="dense"] {
   .row {
@@ -87,12 +83,7 @@
   }
 }
 
-[data-app-sizing="dense"] {
-  --bs-root-font-size: 15px;
-}
-
 [data-app-sizing="medium"] {
-  --bs-root-font-size: 15px;
   .g-3, .gy-3 {
     --#{$prefix}gutter-y: .75rem;
   }

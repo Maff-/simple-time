@@ -459,6 +459,7 @@ const defaultSettings = {
     hideLoggedService: false,
     hideLoggedType: false,
     theme: 'auto',
+    fontSize: '1rem',
     sizing: 'regular',
 };
 
@@ -713,6 +714,9 @@ export default {
         theme () {
             return this.settings.theme ?? 'auto';
         },
+        fontSize () {
+            return this.settings.fontSize ?? '1rem';
+        },
         sizing () {
             return this.settings.sizing ?? 'regular';
         },
@@ -869,6 +873,12 @@ export default {
             immediate: true,
             handler (theme) {
                 themeSelector.setTheme(theme);
+            },
+        },
+        fontSize: {
+            immediate: true,
+            handler (fontSize) {
+                document.documentElement.style.setProperty('--bs-root-font-size', fontSize);
             },
         },
         sizing: {

@@ -1,13 +1,19 @@
 <template>
     <form class="row g-3">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-4">
             <label for="theme" class="form-label">Color Theme</label>
             <select v-model="value.theme" id="theme" class="form-select">
                 <option v-for="(details, option) in themeOptions" :key="option" :value="option">{{ details.label }}</option>
             </select>
         </div>
-        <div class="col-12 col-md-6">
-            <label for="theme" class="form-label">Font sizes & spacing</label>
+        <div class="col-12 col-md-4">
+            <label for="fontSize" class="form-label">Font size</label>
+            <select v-model="value.fontSize" id="font-size" class="form-select">
+                <option v-for="option in ['1rem', '12px', '13px', '14px', '15px', '16px', '17px', '18px']" :key="option" :value="option">{{ option }}</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-4">
+            <label for="theme" class="form-label">Spacing</label>
             <select v-model="value.sizing" id="sizing" class="form-select">
                 <option v-for="option in ['small', 'dense', 'medium', 'regular']" :key="option" :value="option">{{ option }}</option>
             </select>
