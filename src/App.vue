@@ -140,7 +140,7 @@
                     placeholder="Hours"
                 />
             </div>
-            <div class="col-sm-6" v-for="inputName in inputOrder" :key="inputName">
+            <div :class="inputOrder.length > 1 ? 'col-sm-6' : 'col-sm-12'" v-for="inputName in inputOrder" :key="inputName">
                 <v-select
                     v-if="inputName === 'jiraIssue'"
                     uid="jira-issue-selector"
@@ -224,7 +224,7 @@
                     </th>
                     <th style="width:0.1%">Hours</th>
                     <th>Description</th>
-                    <th style="width:0.1%">Jira issue</th>
+                    <th v-if="!settings.jiraDisabled" style="width:0.1%">Jira issue</th>
                     <th style="width:0.1%">
                         <abbr class="d-xl-none" title="Actions">Act.</abbr>
                         <span class="d-none d-xl-inline">Actions</span>
@@ -252,7 +252,7 @@
                         </div>
                     </td>
                     <td>{{ hours.note }}</td>
-                    <td :class="{'table-warning': hours.jiraKey && jiraIssue && hours.jiraKey === jiraIssue}" class="text-nowrap">
+                    <td v-if="!settings.jiraDisabled" :class="{'table-warning': hours.jiraKey && jiraIssue && hours.jiraKey === jiraIssue}" class="text-nowrap">
                         <a v-if="hours.jiraKey" :href="hours.externalUrl || `${jiraUrl}/browse/${hours.jiraKey}`" class="text-nowrap" target="_blank" rel="nofollow noopener">{{ hours.jiraKey }}</a>
                         <a v-else-if="hours.externalUrl" :href="hours.externalUrl" target="_blank" rel="nofollow noopener">link</a> <!-- TODO: some last part of url? -->
                     </td>
@@ -323,7 +323,7 @@
                     </ul>
                 </div>
                 <a data-bs-toggle="modal" href="#settings" class="text-muted">Settings</a>
-                <a data-bs-toggle="modal" href="#project-mapping" class="text-muted">Project Mapping</a>
+                <a data-bs-toggle="modal" href="#project-mapping" class="text-muted" v-if="!settings.jiraDisabled">Project Mapping</a>
                 <a data-bs-toggle="modal" href="#shortcuts" class="text-muted">Shortcuts</a>
             </nav>
             <div v-if="user">
@@ -369,7 +369,7 @@
         </div>
 
         <!-- FIXME: we must use a static backdrop and disable esc discarding to prevent v-select from triggering modal hide -->
-        <div class="modal" id="project-mapping" ref="projectMappingModal" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal" id="project-mapping" ref="projectMappingModal" data-bs-backdrop="static" data-bs-keyboard="false" v-if="!settings.jiraDisabled">
             <div class="modal-dialog modal-xl modal-fullscreen-lg-down">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -439,6 +439,7 @@ const defaultSettings = {
     jiraProjectKeyPattern: '[A-Z][A-Z_0-9]+',
     projectsSort: 'project_name',
     jiraDebounce: 200, // ms
+    jiraDisabled: false,
     pickDate: true,
     showDateNav: false,
     requireComment: true,
@@ -705,6 +706,9 @@ export default {
             return this.getRegexes(this.settings.preferredHoursTypeRegex);
         },
         inputOrder () {
+            if (this.settings.jiraDisabled) {
+                return ['comment'];
+            }
             const inputs = ['jiraIssue', 'comment'];
             if (this.settings.commentBeforeJira) {
                 inputs.reverse();
@@ -1427,6 +1431,9 @@ export default {
                 });
         },
         getJiraIssueSearchPrams (search) {
+            if (this.settings.jiraDisabled) {
+                return;
+            }
             //jql=summary~%27FOO%27%20ORDER%20BY%20key&fields=summary,created&maxResults=100&sort=foo
             const searchOr = [];
             const numberMatch = search.match(/^\d{2,}$/);
@@ -1450,6 +1457,9 @@ export default {
             });
         },
         async fetchJiraIssues (params, loading) {
+            if (this.settings.jiraDisabled) {
+                return;
+            }
             return axios.get(this.settings.jiraApiUrl + '/search?' + params, this.jiraConfig)
                 .then(resp => {
                     // FIXME: The X-AUSERNAME header isn't whitelisted in Access-Control-Expose-Headers
@@ -1481,6 +1491,9 @@ export default {
                 });
         },
         fetchJiraProjects () {
+            if (this.settings.jiraDisabled) {
+                return;
+            }
             const params = new URLSearchParams({
                 expand: 'projectKeys',
                 maxResults: 1000, // TODO: use setting, also I believe 200 is the max :P
@@ -1491,6 +1504,9 @@ export default {
                 })
         },
         fetchJiraUser () {
+            if (this.settings.jiraDisabled) {
+                return;
+            }
             this.jiraUserLoading = true;
             axios.get(this.settings.jiraApiUrl + '/myself', this.jiraConfig)
                 .then(resp => {
@@ -1588,6 +1604,9 @@ export default {
                 });
         },
         postJiraWorklog () {
+            if (this.settings.jiraDisabled) {
+                return;
+            }
             if (!this.isValid) {
                 throw new Error('Form must be valid before it can be submitted to Simplicate');
             }
@@ -1676,6 +1695,9 @@ export default {
             this.$refs.hoursInput.focus();
         },
         focusJiraIssueSelect () {
+            if (!this.settings.jiraDisabled || this.$refs.jiraIssueSelector == null) {
+                return;
+            }
             // check for array, due to v-for
             (this.$refs.jiraIssueSelector[0] ?? this.$refs.jiraIssueSelector).$refs.search.focus();
         },
@@ -1701,7 +1723,7 @@ export default {
             this.fetchUser();
         }
         this.fetchJiraUser();
-        this.$refs.projectMappingModal.addEventListener('show.bs.modal', () => {
+        this.$refs.projectMappingModal?.addEventListener('show.bs.modal', () => {
             // Find 'unknown' projects
             if (this.projects.length && this.projectMapping.length) {
                 const knownProjectIds = this.projects.map(p => p.id);

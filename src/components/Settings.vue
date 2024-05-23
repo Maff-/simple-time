@@ -35,7 +35,7 @@
             </div>
             <div class="form-text" v-if="!value.pickDate">Only available when <a href="#pickDate" class="link-secondary">Allow to pick a date</a> is enabled. (See above)</div>
         </div>
-        <div class="col-12">
+        <div class="col-12" v-if="!value.jiraDisabled">
             <div class="form-check">
                 <input type="checkbox" v-model="value.jiraSetStarted" id="jiraSetStarted" class="form-check-input">
                 <label for="jiraSetStarted" class="form-check-label">
@@ -64,7 +64,7 @@
                 </label>
             </div>
         </div>
-        <div class="col-12">
+        <div class="col-12" v-if="!value.jiraDisabled">
             <div class="form-check">
                 <input type="checkbox" v-model="value.commentBeforeJira" id="commentBeforeJira" class="form-check-input">
                 <label for="commentBeforeJira" class="form-check-label">
@@ -72,7 +72,7 @@
                 </label>
             </div>
         </div>
-        <div class="col-12">
+        <div class="col-12" v-if="!value.jiraDisabled">
             <div class="form-check">
                 <input type="checkbox" v-model="value.prefixCommentIssue" id="prefixCommentIssue" class="form-check-input">
                 <label for="prefixCommentIssue" class="form-check-label">
@@ -174,11 +174,11 @@
             <label for="apiUrl" class="form-label">Simplicate API URL</label>
             <input type="url" v-model.lazy="value.apiUrl" id="apiUrl" required class="form-control">
         </div>
-        <div class="col-12">
+        <div class="col-12" v-if="!value.jiraDisabled">
             <label for="jiraApiUrl" class="form-label">Jira API URL</label>
             <input type="url" v-model.lazy="value.jiraApiUrl" id="jiraApiUrl" required class="form-control">
         </div>
-        <div class="col-12">
+        <div class="col-12" v-if="!value.jiraDisabled">
             <label for="jiraProjectKeyPattern" class="form-label">Jira Project Key Pattern</label>
             <input type="text" v-model.lazy="value.jiraProjectKeyPattern" id="jiraProjectKeyPattern" required class="form-control" :class="{'is-invalid': jiraProjectKeyPatternInvalid}">
             <div class="form-text">
@@ -192,6 +192,14 @@
             </div>
             <div v-if="jiraProjectKeyPatternInvalid" class="invalid-feedback">Invalid regular expression; (<code>new RegExp('{{ value.jiraProjectKeyPattern }}')</code> failed)</div>
         </div>
+        <div class="col-12">
+            <div class="form-check">
+                <input type="checkbox" v-model="value.jiraDisabled" id="jiraDisabled" class="form-check-input">
+                <label for="jiraDisabled" class="form-check-label">
+                    Disable Jira altogether 😱
+                </label>
+            </div>
+        </div>
 
         <div class="col-12">
             <hr>
@@ -201,8 +209,8 @@
             <div class="form-check">
                 <input type="checkbox" v-model="value.confirmPosts" id="confirmPosts" class="form-check-input">
                 <label for="confirmPosts" class="form-check-label">
-                    Ask confirmation before sending data to Simplicate/Jira
-                    <span class="badge bg-secondary">dev</span>
+                    Ask confirmation before sending data to Simplicate<span v-if="!value.jiraDisabled">/Jira</span>
+                    &nbsp;<span class="badge bg-secondary">dev</span>
                 </label>
             </div>
         </div>

@@ -76,7 +76,6 @@ While this tools has been in use at the company since early 2022, there are stil
   * Simplicate's authorization server does not support CORS headers (yet?). We have to use a custom proxy for the last step of the OAuth process!
 * The http server serving Jira needs to be configured to serve CORS headers.
 * Link Jira _worklog_ back to Simplicate entry (or the other way around)!! (A solution for this has been thought out, but is not implemented yet).
-* Make Jira integration more optional.
 * Support multiple Jira instances (mapped to Simplicate project?).
 * Timers.
 * Weekly hours target per project.
