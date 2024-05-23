@@ -53,6 +53,20 @@ If you want to host the application at a sub-path, make sure to set the `BASE_UR
 See the Vue CLI [Deployment Guide](https://cli.vuejs.org/guide/deployment.html)
 and [Configuration Reference](https://cli.vuejs.org/config/) for more information and additional options.
 
+
+### Cloud-hosted Jira
+
+In order to use this tool with Jira Cloud you must register an OAuth 2.0 (3LO) app at https://developer.atlassian.com/console/myapps/.
+The callback url should be `https://your-domain.com/#/jira-auth/` (or whatever domain you are hosting the tool at).
+For permissions, you need the 'Classic' `read:jira-user`, `read:jira-work` and `write:jira-work` scopes.
+
+You can then configure the `VUE_APP_JIRA_CLIENT_ID` and `VUE_APP_JIRA_CLIENT_SECRET` vars in the `.env.local` file.
+
+
+### Self-hosted Jira
+
+When using a self-hosted instance of Jira extra steps might be necessary;
+
 Because of _same site_ and _cross-origin_ limitations the tools should be served at the same domain name as Jira.
 This can be a different subdomain though. (For example `jira.your-company.nl` and `simple-time.your-company.nl`).
 
@@ -74,7 +88,7 @@ While this tools has been in use at the company since early 2022, there are stil
   * In the meantime we are 'borrowing' the client id/secret from their Chrome plugin.
   * This makes the authorization process somewhat unusual.
   * Simplicate's authorization server does not support CORS headers (yet?). We have to use a custom proxy for the last step of the OAuth process!
-* The http server serving Jira needs to be configured to serve CORS headers.
+* The http server serving Jira needs to be configured to serve CORS headers. (Jira Cloud already does this).
 * Link Jira _worklog_ back to Simplicate entry (or the other way around)!! (A solution for this has been thought out, but is not implemented yet).
 * Support multiple Jira instances (mapped to Simplicate project?).
 * Timers.

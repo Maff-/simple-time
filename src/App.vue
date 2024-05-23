@@ -13,6 +13,18 @@
 
         <div v-if="user">
 
+        <div v-if="!settings.jiraDisabled && (!jiraAccessToken || !jiraCloudId || jiraUserFailure)" class="mb-5">
+            <jira-setup
+                :access-token="jiraAccessToken"
+                :cloudId="jiraCloudId"
+                :failed="jiraUserFailure"
+                :settings="settings"
+                @auth="onJiraAuth"
+                @resource-change="onJiraSiteSelect"
+                @disable="settings.jiraDisabled = true; reloadPage();"
+            />
+        </div>
+
         <section class="row g-3 mb-3">
             <div class="col-auto" v-if="settings.pickDate && settings.showDateNav">
                 <button type="button" id="prev-day" @click="prevDay" class="btn btn-gray" tabindex="1-"><i class="bi-arrow-left"></i></button>
@@ -148,7 +160,7 @@
                     ref="jiraIssueSelector"
                     class="vs--single-line"
                     @hook:mounted="onSelectMounted('jiraIssueSelector')"
-                    :placeholder="'Jira issue' + (!jiraUser ? ' - Not logged in' : '')"
+                    :placeholder="'Jira issue' + (!jiraUser ? ' - Not connected' : '')"
                     v-model="jiraIssue"
                     :options="jiraIssues"
                     :reduce="i => i.key"
@@ -429,6 +441,7 @@ import debounce from '@/lib/debounce';
 import dateWeekNumber from "@/lib/dateWeekNumber";
 import dateUtil from "@/lib/dateUtil";
 import themeSelector from "@/lib/themeSelector";
+import JiraSetup from '@/components/JiraSetup.vue';
 
 const jiraUrl = process.env.VUE_APP_JIRA_URL;
 const version = process.env.VUE_APP_VERSION;
@@ -466,7 +479,7 @@ const defaultSettings = {
 
 export default {
     name: 'App',
-    components: {WeekTotals, ProjectMapper, SimplicateSetup, HoursInput, Settings, Shortcuts},
+    components: {JiraSetup, WeekTotals, ProjectMapper, SimplicateSetup, HoursInput, Settings, Shortcuts},
     data () {
         return {
 
@@ -476,10 +489,9 @@ export default {
             authKey: window.localStorage.getItem('authKey') || process.env.VUE_APP_SIMPLICATE_AUTH_KEY || null,
             authSecret: window.localStorage.getItem('authSecret') || process.env.VUE_APP_SIMPLICATE_AUTH_SECRET || null,
 
-            jiraUrl,
-            jiraConfig: {
-                withCredentials: true,
-            },
+            jiraUrl: window.localStorage.getItem('jiraUrl') || jiraUrl || null,
+            jiraAccessToken: window.localStorage.getItem('jiraAccessToken') || process.env.VUE_APP_JIRA_ACCESS_TOKEN || null,
+            jiraCloudId: window.localStorage.getItem('jiraCloudId') || process.env.VUE_APP_JIRA_CLOUD_ID || null,
 
             user: null,
             userLoading: false,
@@ -524,6 +536,7 @@ export default {
 
             jiraUser: null,
             jiraUserLoading: null,
+            jiraUserFailure: false,
 
             isTodayUpdate: 0,
         }
@@ -547,6 +560,20 @@ export default {
                     'Authentication-Secret': this.authSecret,
                 }
             }
+        },
+        jiraConfig () {
+            if (this.jiraAccessToken) {
+                return {
+                    headers: {
+                        Authorization: `Bearer ${this.jiraAccessToken}`,
+                    },
+                };
+            }
+
+            // Fallback for old automatic authentication via cookie
+            return {
+                withCredentials: true,
+            };
         },
         dateValue () {
             return dateUtil.formatDate(this.date);
@@ -773,6 +800,30 @@ export default {
                 this.services = [];
             }
         },
+        jiraUrl (url) {
+            if (url) {
+                window.localStorage.setItem('jiraUrl', url);
+            } else {
+                window.localStorage.removeItem('jiraUrl');
+            }
+        },
+        jiraAccessToken (token) {
+            if (token) {
+                window.localStorage.setItem('jiraAccessToken', token);
+            } else {
+                window.localStorage.removeItem('jiraAccessToken');
+            }
+        },
+        jiraCloudId (id) {
+            if (id) {
+                window.localStorage.setItem('jiraCloudId', id);
+            } else {
+                window.localStorage.removeItem('jiraCloudId');
+            }
+            if (id) {
+                this.settings.jiraApiUrl = `https://api.atlassian.com/ex/jira/${id}/rest/api/2`;
+            }
+        },
         jiraProjectsSelected (projects) {
             if (projects.length > 0 && projects.length < 10) {
                 const jql = `project IN (${this.jiraProjectsSelected.map(p => p.key).join(',')}) ORDER BY updated DESC`;
@@ -893,6 +944,9 @@ export default {
         },
     },
     methods: {
+        reloadPage () {
+            window.location = window.location.origin + window.location.pathname;
+        },
         confirmLogout() {
             if (window.confirm('Are you sure you want to log out from Simplicate?\n\nThis will require you to re-authorize this application if you want use it again.\n\n\nPlease note this does not revoke the application authorization or api key, it merely removes the locally stored user/auth information. Revoking api/app access can be done in the Simplicate interface.')) {
                 this.logout();
@@ -1145,6 +1199,19 @@ export default {
             this.authKey = authKey;
             this.authSecret = authSecret;
             this.fetchUser();
+        },
+        onJiraAuth (accessToken) {
+            this.jiraAccessToken = accessToken;
+            if (accessToken && window.location.hash.match(/\/jira-auth\//)) {
+                this.reloadPage();
+            }
+        },
+        onJiraSiteSelect (cloudId, url) {
+            this.jiraCloudId = cloudId;
+            this.jiraUrl = url;
+            if (url) {
+                this.fetchJiraUser();
+            }
         },
         onSelectMounted(ref) {
             // Prevent tabbing to the clear button of the vue-select input
@@ -1502,12 +1569,21 @@ export default {
                 .then(resp => {
                     this.jiraProjects = resp.data;
                 })
+                .catch(error => {
+                    if (error.response && error.response.data && error.response.data.errorMessages) {
+                        console.warn('Error fetching Jira projects;', error.response.data.errorMessages.join(', '));
+                        console.debug(error);
+                    } else {
+                        console.error('Error fetching Jira projects;', error);
+                    }
+                })
         },
         fetchJiraUser () {
             if (this.settings.jiraDisabled) {
                 return;
             }
             this.jiraUserLoading = true;
+            this.jiraUserFailure = false;
             axios.get(this.settings.jiraApiUrl + '/myself', this.jiraConfig)
                 .then(resp => {
                     this.jiraUser = resp.data;
@@ -1515,6 +1591,7 @@ export default {
                 .catch((err) => {
                     console.error('Failed to load Jira user, not logged in?', err);
                     this.jiraUser = null;
+                    this.jiraUserFailure = true;
                 })
                 .finally(() => {
                     this.jiraUserLoading = false;
