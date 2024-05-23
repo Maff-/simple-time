@@ -331,7 +331,7 @@
                     Logged in as
                     <a href="#" class="text-muted" data-bs-toggle="dropdown" aria-expanded="false">
                         <span>{{ employee ? employee.name : user.username }}</span>
-                        <img v-if="employee && employee.avatar && employee.avatar.url_small" :src="employee.avatar.url_small" class="rounded-circle ms-2" style="width: 2rem; height: 2rem" :alt="employee.avatar.initals">
+<!--                        <img v-if="employee && employee.avatar && employee.avatar.url_small" :src="employee.avatar.url_small" class="rounded-circle ms-2" style="width: 2rem; height: 2rem" :alt="employee.avatar.initals">-->
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a @click="confirmLogout" href="#" class="dropdown-item">Log out from Simplicate</a></li>
