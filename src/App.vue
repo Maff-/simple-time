@@ -1311,7 +1311,7 @@ export default {
                 .then(result => {
                     this.loggedHours = result.map(entry => {
                         const externalUrlFields = (entry.custom_fields || []).filter(f => f.name === 'external_url' && f.value);
-                        const externalUrl = externalUrlFields.length ? externalUrlFields[0].value : null;
+                        const externalUrl = entry.external_url ?? (externalUrlFields.length ? externalUrlFields[0].value : null);
                         const jiraKeyMatch = externalUrl ? externalUrl.match(/\/browse\/([A-Z][A-Z_0-9]+-\d+)/i) : null;
                         const jiraKey = jiraKeyMatch ? jiraKeyMatch[1] : null;
 
@@ -1540,6 +1540,7 @@ export default {
                 data.note = this.comment;
             }
             if (this.jiraIssue) {
+                data.external_url = `${this.jiraUrl}/browse/${this.jiraIssue}`;
                 data.custom_fields = [{
                     external_url: `${this.jiraUrl}/browse/${this.jiraIssue}`,
                 }];
