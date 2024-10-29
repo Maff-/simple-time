@@ -442,13 +442,13 @@ import dateWeekNumber from "@/lib/dateWeekNumber";
 import dateUtil from "@/lib/dateUtil";
 import themeSelector from "@/lib/themeSelector";
 import JiraSetup from '@/components/JiraSetup.vue';
+import {jiraApiUrlTemplate} from '@/lib/jiraClient';
 
 const jiraUrl = process.env.VUE_APP_JIRA_URL;
 const version = process.env.VUE_APP_VERSION;
 
 const defaultSettings = {
     apiUrl: `${process.env.VUE_APP_SIMPLICATE_URL}/api/v2`,
-    jiraApiUrl: `${jiraUrl}/rest/api/2`,
     jiraProjectKeyPattern: '[A-Z][A-Z_0-9]+',
     projectsSort: 'project_name',
     jiraDebounce: 200, // ms
@@ -481,6 +481,8 @@ export default {
     name: 'App',
     components: {JiraSetup, WeekTotals, ProjectMapper, SimplicateSetup, HoursInput, Settings, Shortcuts},
     data () {
+        const jiraCloudId = window.localStorage.getItem('jiraCloudId') || process.env.VUE_APP_JIRA_CLOUD_ID || null;
+
         return {
 
             version: version,
@@ -491,7 +493,9 @@ export default {
 
             jiraUrl: window.localStorage.getItem('jiraUrl') || jiraUrl || null,
             jiraAccessToken: window.localStorage.getItem('jiraAccessToken') || process.env.VUE_APP_JIRA_ACCESS_TOKEN || null,
-            jiraCloudId: window.localStorage.getItem('jiraCloudId') || process.env.VUE_APP_JIRA_CLOUD_ID || null,
+            jiraAccessTokenExpiry: (value => value ? new Date(value) : null)(window.localStorage.getItem('jiraAccessTokenExpiry') || null),
+            jiraRefreshToken: window.localStorage.getItem('jiraRefreshToken') || process.env.VUE_APP_JIRA_REFRESH_TOKEN || null,
+            jiraCloudId,
 
             user: null,
             userLoading: false,
@@ -504,7 +508,9 @@ export default {
             submissions: [],
             submissionsLoading: false,
 
-            settings: Object.assign({}, defaultSettings, JSON.parse(window.localStorage.getItem('settings') || '{}')),
+            settings: Object.assign({}, defaultSettings, {
+                jiraApiUrl: jiraCloudId ? jiraApiUrlTemplate.replaceAll('{id}', jiraCloudId) : null,
+            }, JSON.parse(window.localStorage.getItem('settings') || '{}')),
 
             projectMapping: JSON.parse(window.localStorage.getItem('projectMapping') || '[]')
                 .filter(([s, j]) => s.length || j.length),
@@ -548,9 +554,6 @@ export default {
         employee () {
             return this.user && this.user.employee_id ? this.employees.find(e => e.id === this.user.employee_id) : null;
         },
-        bearer () {
-            return this.authKey && this.authSecret ? `${this.authKey}:${this.authSecret}` : null;
-        },
         apiConfig () {
             return {
                 headers: {
@@ -560,20 +563,6 @@ export default {
                     'Authentication-Secret': this.authSecret,
                 }
             }
-        },
-        jiraConfig () {
-            if (this.jiraAccessToken) {
-                return {
-                    headers: {
-                        Authorization: `Bearer ${this.jiraAccessToken}`,
-                    },
-                };
-            }
-
-            // Fallback for old automatic authentication via cookie
-            return {
-                withCredentials: true,
-            };
         },
         dateValue () {
             return dateUtil.formatDate(this.date);
@@ -801,6 +790,7 @@ export default {
             }
         },
         jiraUrl (url) {
+            this.$jiraClient.jiraUrl = url;
             if (url) {
                 window.localStorage.setItem('jiraUrl', url);
             } else {
@@ -808,20 +798,40 @@ export default {
             }
         },
         jiraAccessToken (token) {
+            this.$jiraClient.jiraAccessToken = token;
             if (token) {
                 window.localStorage.setItem('jiraAccessToken', token);
             } else {
                 window.localStorage.removeItem('jiraAccessToken');
             }
         },
+        jiraAccessTokenExpiry (value) {
+            this.$jiraClient.jiraAccessTokenExpiry = value;
+            if (value) {
+                window.localStorage.setItem('jiraAccessTokenExpiry', value.toJSON());
+            } else {
+                window.localStorage.removeItem('jiraAccessTokenExpiry');
+            }
+        },
+        jiraRefreshToken (token) {
+            this.$jiraClient.jiraRefreshToken = token;
+            if (token) {
+                window.localStorage.setItem('jiraRefreshToken', token);
+            } else {
+                window.localStorage.removeItem('jiraRefreshToken');
+            }
+        },
         jiraCloudId (id) {
+            this.$jiraClient.jiraCloudId = id;
             if (id) {
                 window.localStorage.setItem('jiraCloudId', id);
             } else {
                 window.localStorage.removeItem('jiraCloudId');
             }
             if (id) {
-                this.settings.jiraApiUrl = `https://api.atlassian.com/ex/jira/${id}/rest/api/2`;
+                this.settings.jiraApiUrl = jiraApiUrlTemplate.replaceAll('{id}', id);
+                this.$jiraClient.jiraApiUrl = this.settings.jiraApiUrl;
+                this.fetchJiraUser();
             }
         },
         jiraProjectsSelected (projects) {
@@ -838,6 +848,11 @@ export default {
         jiraIssue (issue) {
             if (this.settings.prefixCommentIssue && issue && (!this.comment || this.comment === '' || this.comment.match(/^\w+-\d+(: )?$/))) {
                 this.comment = issue + ': ';
+            }
+        },
+        jiraUser (user) {
+            if (user && this.jiraProjects.length === 0) {
+                this.fetchJiraProjects();
             }
         },
         prioritizedServices (value, prev) {
@@ -1200,8 +1215,10 @@ export default {
             this.authSecret = authSecret;
             this.fetchUser();
         },
-        onJiraAuth (accessToken) {
+        onJiraAuth (accessToken, expiry, refreshToken) {
             this.jiraAccessToken = accessToken;
+            this.jiraRefreshToken = refreshToken ?? this.jiraRefreshToken;
+            this.jiraAccessTokenExpiry = expiry != null ? new Date((new Date) + (expiry * 1000)) : null;
             if (accessToken && window.location.hash.match(/\/jira-auth\//)) {
                 this.reloadPage();
             }
@@ -1527,7 +1544,7 @@ export default {
             if (this.settings.jiraDisabled) {
                 return;
             }
-            return axios.get(this.settings.jiraApiUrl + '/search?' + params, this.jiraConfig)
+            return this.$jiraClient.fetchIssues(params)
                 .then(resp => {
                     // FIXME: The X-AUSERNAME header isn't whitelisted in Access-Control-Expose-Headers
                     const username = resp.headers['x-ausername'] || null;
@@ -1558,14 +1575,14 @@ export default {
                 });
         },
         fetchJiraProjects () {
-            if (this.settings.jiraDisabled) {
+            if (this.settings.jiraDisabled || !this.settings.jiraApiUrl) {
                 return;
             }
             const params = new URLSearchParams({
                 expand: 'projectKeys',
                 maxResults: 1000, // TODO: use setting, also I believe 200 is the max :P
             });
-            axios.get(this.settings.jiraApiUrl + '/project?' + params, this.jiraConfig)
+            this.$jiraClient.fetchProjects(params)
                 .then(resp => {
                     this.jiraProjects = resp.data;
                 })
@@ -1574,17 +1591,17 @@ export default {
                         console.warn('Error fetching Jira projects;', error.response.data.errorMessages.join(', '));
                         console.debug(error);
                     } else {
-                        console.error('Error fetching Jira projects;', error);
+                        console.trace('Error fetching Jira projects;', error);
                     }
                 })
         },
         fetchJiraUser () {
-            if (this.settings.jiraDisabled) {
+            if (this.settings.jiraDisabled || !this.settings.jiraApiUrl) {
                 return;
             }
             this.jiraUserLoading = true;
             this.jiraUserFailure = false;
-            axios.get(this.settings.jiraApiUrl + '/myself', this.jiraConfig)
+            this.$jiraClient.fetchUser()
                 .then(resp => {
                     this.jiraUser = resp.data;
                 })
@@ -1682,7 +1699,7 @@ export default {
                 });
         },
         postJiraWorklog () {
-            if (this.settings.jiraDisabled) {
+            if (this.settings.jiraDisabled || !this.settings.jiraApiUrl) {
                 return;
             }
             if (!this.isValid) {
@@ -1703,14 +1720,11 @@ export default {
             if (!this.isToday && this.settings.jiraSetStarted && this.date) {
                 content.started = this.date.toISOString().replace('Z', '+0000');
             }
-
-            const url = `${this.settings.jiraApiUrl}/issue/${this.jiraIssue}/worklog`;
-
-            if (this.settings.confirmPosts && !window.confirm(`Are you sure you want to send ${JSON.stringify(content)} to ${url}?`)) {
+            if (this.settings.confirmPosts && !window.confirm(`Are you sure you want to send ${JSON.stringify(content)} to issue ${this.jiraIssue}`)) {
                 console.warn('Cancelling Jira submit', content);
                 return;
             }
-            return axios.post(url, content, this.jiraConfig)
+            return this.$jiraClient.postWorkLog(this.jiraIssue, content)
                 .then(resp => {
                     console.info('Added worklog at Jira as #%d; %s', resp.data.id || null, resp.data.self || null);
                     console.debug(resp);
@@ -1800,7 +1814,7 @@ export default {
         if (!this.user && this.authKey && this.authSecret) {
             this.fetchUser();
         }
-        this.fetchJiraUser();
+
         this.$refs.projectMappingModal?.addEventListener('show.bs.modal', () => {
             // Find 'unknown' projects
             if (this.projects.length && this.projectMapping.length) {
@@ -1811,17 +1825,23 @@ export default {
                     .forEach(id => this.fetchUnknownProject(id));
             }
         });
+
         themeSelector.watchPreferredColorScheme(() => this.theme);
+
+        this.fetchJiraUser();
     },
     created () {
+        this.$jiraClient.jiraUrl = this.jiraUrl;
+        this.$jiraClient.jiraApiUrl = this.settings.jiraApiUrl;
+        this.$jiraClient.accessToken = this.jiraAccessToken;
+        this.$jiraClient.accessTokenExpiry = this.jiraAccessTokenExpiry;
+        this.$jiraClient.refreshToken = this.jiraRefreshToken;
+
         document.addEventListener('visibilitychange', this.onVisibilityChange);
         window.addEventListener('keyup', this.onKeyUp);
         window.addEventListener('hashchange', this.onHashChange);
         this.onHashChange();
         this.debounceFetchJiraIssues = debounce(this.fetchJiraIssues, this.settings.jiraDebounce || defaultSettings.jiraDebounce);
-        if (this.jiraProjects.length === 0) {
-            this.fetchJiraProjects();
-        }
     },
     destroyed () {
         document.removeEventListener('visibilitychange', this.onVisibilityChange);
