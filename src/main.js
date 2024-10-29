@@ -5,6 +5,7 @@ import 'bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import './assets/scss/styling.scss';
+import {JiraClient} from '@/lib/jiraClient';
 
 // Override default deselect button content
 vSelect.props.components.default = () => ({
@@ -21,6 +22,8 @@ vSelect.props.components.default = () => ({
 Vue.component('v-select', vSelect);
 
 Vue.config.productionTip = false;
+
+Vue.prototype.$jiraClient = new JiraClient();
 
 new Vue({
     render: h => h(App),

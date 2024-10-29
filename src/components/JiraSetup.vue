@@ -51,35 +51,13 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const clientId = process.env.VUE_APP_JIRA_CLIENT_ID;
-const clientSecret = process.env.VUE_APP_JIRA_CLIENT_SECRET;
-const redirectUri = process.env.VUE_APP_JIRA_REDIRECT_URL;
-const oauthUri = 'https://auth.atlassian.com';
-const oauthAuthorizeUri = process.env.VUE_APP_JIRA_OAUTH_AUTHORIZE_URL || `${oauthUri}/authorize`;
-const oauthTokenUri = process.env.VUE_APP_JIRA_OAUTH_TOKEN_URL || `${oauthUri}/oauth/token`;
-const oauthAccessibleResourcesUri = process.env.VUE_APP_JIRA_OAUTH_ACCESSIBLE_RESOURCES_URL || `https://api.atlassian.com/oauth/token/accessible-resources`;
-const audience = 'api.atlassian.com';
-const scope = [
-    // 'read:me',
-    'read:jira-user',
-    'read:jira-work',
-    'write:jira-work',
-    // TODO: use granular scope?
-    // Granular scopes: // FIXME: mix&match with classic and granular doesn't seem to work properly
-    // 'read:user:jira', // needed for /myself
-    // 'read:avatar:jira', // needed for /myself
-    // 'read:application-role:jira', // needed for /myself
-    // 'read:group:jira', // needed for /myself
-    // 'read:issue-worklog:jira',
-    // 'write:issue-worklog:jira',
-    // 'delete:issue-worklog:jira',
-    // 'read:issue-worklog.property:jira',
-    // 'write:issue-worklog.property:jira',
-    // 'delete:issue-worklog.property:jira',
-    // write:issue-worklog:jira, write:issue-worklog.property:jira, read:avatar:jira, read:group:jira, read:issue-worklog:jira, read:project-role:jira, read:user:jira, read:issue-worklog.property:jira // FIXME: add as array elements
-];
+import {
+    clientId,
+    redirectUri,
+    oauthAuthorizeUri,
+    audience,
+    scope,
+} from '@/lib/jiraClient';
 
 export default {
     name: 'JiraSetup',
@@ -161,26 +139,20 @@ export default {
             // Clear previous stored data
             this.authCode = null;
             this.$emit('auth', null, null);
+            this.$emit('refresh', null);
             this.$emit('resource-change', null, null);
             // Redirect user to consent prompt
             window.location = this.authUrl;
         },
         fetchAccessToken () {
-            const data = {
-                grant_type: 'authorization_code',
-                client_id: clientId,
-                client_secret: clientSecret,
-                code: this.authCode,
-                redirect_uri: this.redirectUri,
-            };
-            axios.post(oauthTokenUri, data)
+            this.$jiraClient.fetchAccessToken(this.authCode, this.redirectUri)
                 .then(resp => {
                     if (!resp.data || resp.data.error || !resp.data.access_token) {
                         console.error(resp.data);
                         alert('Authorization failed, please try again.\n\n(The console log may contain additional information about the failure).');
                         throw new Error('Failed to get access_token');
                     }
-                    this.$emit('auth', resp.data.access_token, resp.data.expires_in || null, resp.data);
+                    this.$emit('auth', resp.data.access_token, resp.data.expires_in ?? null, resp.data.refresh_token ?? null, resp.data);
                 })
                 .catch(reason => {
                     console.error(reason);
@@ -190,12 +162,7 @@ export default {
             ;
         },
         fetchAccessibleResources () {
-            if (!this.accessToken) {
-                throw new Error('Jira access token must be available');
-            }
-
-            const config = { headers: { Authorization: `Bearer ${this.accessToken}` } };
-            axios.get(oauthAccessibleResourcesUri, config)
+            this.$jiraClient.fetchAccessibleResources()
                 .then(resp => {
                     if (!resp.data || !Array.isArray(resp.data)) {
                         console.error(resp.data);
