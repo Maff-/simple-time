@@ -282,7 +282,7 @@ export class JiraClient {
         if (!this.jiraApiUrl) {
             throw new Error('The jiraApiUrl must be set before fetching issues.');
         }
-        return this.axios.get(this.jiraApiUrl + '/search?' + params);
+        return this.axios.get(this.jiraApiUrl + '/search/jql?' + params);
     }
 
     async postWorkLog (issueKey, content){
